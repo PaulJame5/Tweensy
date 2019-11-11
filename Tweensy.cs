@@ -1,4 +1,5 @@
 ///<summary> 
+/// Updated: 11/11/2019 Removed Mr. Grayscale dependencies to work as a stand alone tween script
 /// Made for use with Mr. Grayscale. Used Robert Penners functions to make my own tweening tool for simple animations for use with Unity. 
 /// Name Tweensy was used to preent clashes with DoTween in UnityEngine
 /// Free to use for whatever reason with no warranty
@@ -28,7 +29,7 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Used for smoothing out bounceeaseinout
     /// </summary>
-    private readonly  float IN_OUT = .415f;
+    private readonly float IN_OUT = .415f;
 
     public float time = 2;
     private float initial;
@@ -66,7 +67,6 @@ public class Tweensy : MonoBehaviour
 
     [Space(10)]
     public bool isPillar = false;
-    public LockSpritePosition pillar;
 
     public enum ToTween
     {
@@ -163,12 +163,12 @@ public class Tweensy : MonoBehaviour
                 if (GetComponent<Image>())
                 {
                     start = transform.GetComponent<Image>().rectTransform.localScale.y;
-                    transform.GetComponent<Image>().rectTransform.localScale = new Vector3(transform.GetComponent<Image>().rectTransform.localScale.x,start, transform.GetComponent<Image>().rectTransform.localScale.z);
+                    transform.GetComponent<Image>().rectTransform.localScale = new Vector3(transform.GetComponent<Image>().rectTransform.localScale.x, start, transform.GetComponent<Image>().rectTransform.localScale.z);
                 }
                 else
                 {
                     start = transform.localScale.y;
-                    transform.localScale = new Vector3(transform.localScale.x,start, transform.localScale.z);
+                    transform.localScale = new Vector3(transform.localScale.x, start, transform.localScale.z);
                 }
                 end = scaleTarget;
                 break;
@@ -196,24 +196,24 @@ public class Tweensy : MonoBehaviour
         initialEnd = end;
 
 
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
         float temp_value = 0;
-		
-		// This can be removed for your own projects as this was made to work with Mr. Grayscale
-        if(addToTime && World_Rotation.worldRotating == false)
+
+        // This can be removed for your own projects as this was made to work with Mr. Grayscale
+        if (addToTime)
         {
             timeToAddOn = Time.timeSinceLevelLoad - rotatedAt;
             startTime += timeToAddOn;
             setNewTimeSince = false;
             addToTime = false;
         }
-		// World Rotation can be removed to suit your own project needs
-        else if (isPlaying && World_Rotation.worldRotating == false)
+        // World Rotation can be removed to suit your own project needs
+        else if (isPlaying)
         {
             switch (tweenType)
             {
@@ -378,11 +378,11 @@ public class Tweensy : MonoBehaviour
                 case ToTween.SCALE_Y:
                     if (GetComponent<Image>())
                     {
-                        transform.GetComponent<Image>().rectTransform.localScale = new Vector3(transform.GetComponent<Image>().rectTransform.localScale.x,temp_value);
+                        transform.GetComponent<Image>().rectTransform.localScale = new Vector3(transform.GetComponent<Image>().rectTransform.localScale.x, temp_value);
                     }
                     else
                     {
-                        transform.localScale = new Vector2(transform.localScale.x,temp_value);
+                        transform.localScale = new Vector2(transform.localScale.x, temp_value);
                     }
                     break;
 
@@ -431,23 +431,10 @@ public class Tweensy : MonoBehaviour
         } // end if is playing && !rotating
 
 
-		// Again this is created to work with Mr Graycale remove this code if you would like it to work with your own
-        else if(World_Rotation.worldRotating)
-        {
-           // if(addToTime)
+       
 
-            //    timeToAddOn = Time.timeSinceLevelLoad - rotatedAt;
-            
-            //else
-            if(!addToTime)
-            {
-                addToTime = true;
-                rotatedAt = Time.timeSinceLevelLoad;
-            }
-        }
-
-		// switch at end to change state from enter to exit
-        if(!isPlaying && switchAtEnd)
+        // switch at end to change state from enter to exit
+        if (!isPlaying && switchAtEnd)
         {
             switchAtEnd = false;
             switch (state)
@@ -482,11 +469,6 @@ public class Tweensy : MonoBehaviour
             play = false;
         }
 
-		// Used for Mr. Grayscale Project you can remove this for your own project
-        if(isPillar)
-        {
-            pillar.SetSpritePosition();
-        }
     }
 
 
@@ -513,7 +495,7 @@ public class Tweensy : MonoBehaviour
         if (System.Math.Abs(DeltaTime() - 1) < Mathf.Epsilon)
         {
 
-            switch(state)
+            switch (state)
             {
                 case State.ENTER:
                     EnterAnimation();
@@ -601,18 +583,18 @@ public class Tweensy : MonoBehaviour
         }
     }
 
-     float Linear(float t_delta, float t_start, float t_end)
+    float Linear(float t_delta, float t_start, float t_end)
     {
         return Mathf.LerpUnclamped(t_start, t_end, t_delta);
     }
 
-     float QuadraticEaseIn(float t_delta, float t_start, float t_end)
+    float QuadraticEaseIn(float t_delta, float t_start, float t_end)
     {
         return Mathf.LerpUnclamped(t_start, t_end, t_delta * t_delta);
     }
 
     //-(x * (x - 2))
-     float QuadraticEaseOut(float t_delta, float t_start, float t_end)
+    float QuadraticEaseOut(float t_delta, float t_start, float t_end)
     {
         return Mathf.LerpUnclamped(t_start, t_end, -(t_delta * (t_delta - 2)));
     }
@@ -622,7 +604,7 @@ public class Tweensy : MonoBehaviour
     /// y = (1/2)((2x)^2)             ; [0, 0.5)
     /// y = -(1/2)((2x-1)*(2x-3) - 1) ; [0.5, 1]
     /// </summary>
-     public float QuadraticEaseInOut(float t_delta, float t_start, float t_end)
+    public float QuadraticEaseInOut(float t_delta, float t_start, float t_end)
     {
         if (t_delta < 0.5f)
         {
@@ -636,7 +618,7 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Modeled after quarter-cycle of sine wave
     /// </summary>
-     public float SineEaseIn(float t_delta, float t_start, float t_end)
+    public float SineEaseIn(float t_delta, float t_start, float t_end)
     {
         return Mathf.LerpUnclamped(t_start, t_end, Mathf.Sin((t_delta - 1) * HALFPI) + 1);
     }
@@ -644,7 +626,7 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Modeled after quarter-cycle of sine wave (different phase)
     /// </summary>
-     public float SineEaseOut(float t_delta, float t_start, float t_end)
+    public float SineEaseOut(float t_delta, float t_start, float t_end)
     {
         return Mathf.LerpUnclamped(t_start, t_end, Mathf.Sin(t_delta * HALFPI));
     }
@@ -652,7 +634,7 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Modeled after half sine wave
     /// </summary>
-     public float SineEaseInOut(float t_delta, float t_start, float t_end)
+    public float SineEaseInOut(float t_delta, float t_start, float t_end)
     {
         return Mathf.LerpUnclamped(t_start, t_end, 0.5f * (1 - Mathf.Cos(t_delta * PI)));
     }
@@ -660,7 +642,7 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Modeled after the cubic y = x^3
     /// </summary>
-     public float CubicEaseIn(float t_delta, float t_start, float t_end)
+    public float CubicEaseIn(float t_delta, float t_start, float t_end)
     {
         return Mathf.LerpUnclamped(t_start, t_end, Mathf.Pow(t_delta, 3));
     }
@@ -668,7 +650,7 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Modeled after the cubic y = (x - 1)^3 + 1
     /// </summary>
-     public float CubicEaseOut(float t_delta, float t_start, float t_end)
+    public float CubicEaseOut(float t_delta, float t_start, float t_end)
     {
         float temp_val = (t_delta - 1);
         return Mathf.LerpUnclamped(t_start, t_end, Mathf.Pow(temp_val, 3) + 1);
@@ -679,7 +661,7 @@ public class Tweensy : MonoBehaviour
     /// y = (1/2)((2x)^3)       ; [0, 0.5)
     /// y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]
     /// </summary>
-     public float CubicEaseInOut(float t_delta, float t_start, float t_end)
+    public float CubicEaseInOut(float t_delta, float t_start, float t_end)
     {
         if (t_delta < 0.5f)
         {
@@ -695,19 +677,19 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Modeled after the quartic x^4
     /// </summary>
-     public float QuarticEaseIn(float t_delta, float t_start, float t_end)
+    public float QuarticEaseIn(float t_delta, float t_start, float t_end)
     {
-        return Mathf.LerpUnclamped(t_start, t_end, Mathf.Pow(t_delta,4));
+        return Mathf.LerpUnclamped(t_start, t_end, Mathf.Pow(t_delta, 4));
     }
 
     /// <summary>
     /// Modeled after the quartic y = 1 - (x - 1)^4
     /// </summary>
-     public float QuarticEaseOut(float t_delta, float t_start, float t_end)
+    public float QuarticEaseOut(float t_delta, float t_start, float t_end)
     {
         float temp_value = (t_delta - 1);
 
-        return Mathf.LerpUnclamped(t_start, t_end, Mathf.Pow(temp_value,3) * (1 - t_delta) + 1);
+        return Mathf.LerpUnclamped(t_start, t_end, Mathf.Pow(temp_value, 3) * (1 - t_delta) + 1);
     }
 
     /// <summary>
@@ -715,23 +697,23 @@ public class Tweensy : MonoBehaviour
     /// y = (1/2)((2x)^4)        ; [0, 0.5)
     /// y = -(1/2)((2x-2)^4 - 2) ; [0.5, 1]
     /// </summary>
-     public float QuarticEaseInOut(float t_delta, float t_start, float t_end)
+    public float QuarticEaseInOut(float t_delta, float t_start, float t_end)
     {
         if (t_delta < 0.5f)
         {
-            return Mathf.LerpUnclamped(t_start, t_end, 8 * Mathf.Pow(t_delta,4));
+            return Mathf.LerpUnclamped(t_start, t_end, 8 * Mathf.Pow(t_delta, 4));
         }
         else
         {
             float temp_val = (t_delta - 1);
-            return Mathf.LerpUnclamped(t_start, t_end, -8 * Mathf.Pow(temp_val,4) + 1);
+            return Mathf.LerpUnclamped(t_start, t_end, -8 * Mathf.Pow(temp_val, 4) + 1);
         }
     }
 
     /// <summary>
     /// Modeled after the quintic y = x^5
     /// </summary>
-     public float QuinticEaseIn(float t_delta, float t_start, float t_end)
+    public float QuinticEaseIn(float t_delta, float t_start, float t_end)
     {
         return Mathf.LerpUnclamped(t_start, t_end, Mathf.Pow(t_delta, 5));
     }
@@ -739,7 +721,7 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Modeled after the quintic y = (x - 1)^5 + 1
     /// </summary>
-     public float QuinticEaseOut(float t_delta, float t_start, float t_end)
+    public float QuinticEaseOut(float t_delta, float t_start, float t_end)
     {
         float temp_val = (t_delta - 1);
 
@@ -751,7 +733,7 @@ public class Tweensy : MonoBehaviour
     /// y = (1/2)((2x)^5)       ; [0, 0.5)
     /// y = (1/2)((2x-2)^5 + 2) ; [0.5, 1]
     /// </summary>
-     public float QuinticEaseInOut(float t_delta,float t_start, float t_end)
+    public float QuinticEaseInOut(float t_delta, float t_start, float t_end)
     {
         if (t_delta < 0.5f)
         {
@@ -768,7 +750,7 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Modeled after shifted quadrant IV of unit circle
     /// </summary>
-     public float CircularEaseIn(float t_delta, float t_start, float t_end)
+    public float CircularEaseIn(float t_delta, float t_start, float t_end)
     {
         return Mathf.LerpUnclamped(t_start, t_end, 1 - Mathf.Sqrt(1 - (t_delta * t_delta)));
     }
@@ -776,7 +758,7 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Modeled after shifted quadrant II of unit circle
     /// </summary>
-     public float CircularEaseOut(float t_delta,float t_start, float t_end)
+    public float CircularEaseOut(float t_delta, float t_start, float t_end)
     {
         return Mathf.LerpUnclamped(t_start, t_end, Mathf.Sqrt((2 - t_delta) * t_delta));
     }
@@ -786,7 +768,7 @@ public class Tweensy : MonoBehaviour
     /// y = (1/2)(1 - Math.Sqrt(1 - 4x^2))           ; [0, 0.5)
     /// y = (1/2)(Math.Sqrt(-(2x - 3)*(2x - 1)) + 1) ; [0.5, 1]
     /// </summary>
-     public float CircularEaseInOut(float t_delta, float t_start, float t_end)
+    public float CircularEaseInOut(float t_delta, float t_start, float t_end)
     {
         if (t_delta < 0.5f)
         {
@@ -801,7 +783,7 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Modeled after the exponential function y = 2^(10(x - 1))
     /// </summary>
-     public float ExponentialEaseIn(float t_delta, float t_start, float t_end)
+    public float ExponentialEaseIn(float t_delta, float t_start, float t_end)
     {
         return Mathf.LerpUnclamped(t_start, t_end, (System.Math.Abs(t_delta) < Mathf.Epsilon) ? t_delta : Mathf.Pow(2, 10 * (t_delta - 1)));
     }
@@ -809,7 +791,7 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Modeled after the exponential function y = -2^(-10x) + 1
     /// </summary>
-     public float ExponentialEaseOut(float t_delta, float t_start, float t_end)
+    public float ExponentialEaseOut(float t_delta, float t_start, float t_end)
     {
         return Mathf.LerpUnclamped(t_start, t_end, (System.Math.Abs(t_delta - 1.0f) < Mathf.Epsilon) ? t_delta : 1 - Mathf.Pow(2, -10 * t_delta));
     }
@@ -819,13 +801,13 @@ public class Tweensy : MonoBehaviour
     /// y = (1/2)2^(10(2x - 1))         ; [0,0.5)
     /// y = -(1/2)*2^(-10(2x - 1))) + 1 ; [0.5,1]
     /// </summary>
-     public float ExponentialEaseInOut(float t_delta, float t_start, float t_end)
+    public float ExponentialEaseInOut(float t_delta, float t_start, float t_end)
     {
         if (System.Math.Abs(t_delta) < Mathf.Epsilon || System.Math.Abs(t_delta - 1.0) < Mathf.Epsilon)
         {
             return t_delta;
         }
-            
+
 
         if (t_delta < 0.5f)
         {
@@ -840,7 +822,7 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Modeled after the damped sine wave y = sin(13pi/2*x)*Math.Pow(2, 10 * (x - 1))
     /// </summary>
-     public float ElasticEaseIn(float t_delta, float t_start, float t_end)
+    public float ElasticEaseIn(float t_delta, float t_start, float t_end)
     {
         return Mathf.LerpUnclamped(t_start, t_end, Mathf.Sin(13 * HALFPI * t_delta) * Mathf.Pow(2, 10 * (t_delta - 1)));
     }
@@ -848,7 +830,7 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Modeled after the damped sine wave y = sin(-13pi/2*(x + 1))*Math.Pow(2, -10x) + 1
     /// </summary>
-     public float ElasticEaseOut(float t_delta, float t_start, float t_end)
+    public float ElasticEaseOut(float t_delta, float t_start, float t_end)
     {
         return Mathf.LerpUnclamped(t_start, t_end, Mathf.Sin(-13 * HALFPI * (t_delta + 1)) * Mathf.Pow(2, -10 * t_delta) + 1);
     }
@@ -858,7 +840,7 @@ public class Tweensy : MonoBehaviour
     /// y = (1/2)*sin(13pi/2*(2*x))*Math.Pow(2, 10 * ((2*x) - 1))      ; [0,0.5)
     /// y = (1/2)*(sin(-13pi/2*((2x-1)+1))*Math.Pow(2,-10(2*x-1)) + 2) ; [0.5, 1]
     /// </summary>
-     public float ElasticEaseInOut(float t_delta, float t_start, float t_end)
+    public float ElasticEaseInOut(float t_delta, float t_start, float t_end)
     {
         if (t_delta < 0.5f)
         {
@@ -873,15 +855,15 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Modeled after the overshooting cubic y = x^3-x*sin(x*pi)
     /// </summary>
-     public float BackEaseIn(float t_delta, float t_start, float t_end)
+    public float BackEaseIn(float t_delta, float t_start, float t_end)
     {
-        return Mathf.LerpUnclamped(t_start, t_end, Mathf.Pow(t_delta,3) - t_delta * Mathf.Sin(t_delta * PI));
+        return Mathf.LerpUnclamped(t_start, t_end, Mathf.Pow(t_delta, 3) - t_delta * Mathf.Sin(t_delta * PI));
     }
 
     /// <summary>
     /// Modeled after overshooting cubic y = 1-((1-x)^3-(1-x)*sin((1-x)*pi))
     /// </summary>  
-     public float BackEaseOut(float t_delta, float t_start, float t_end)
+    public float BackEaseOut(float t_delta, float t_start, float t_end)
     {
         //float c = t_start - t_end;
         //float t = t_delta;
@@ -890,7 +872,7 @@ public class Tweensy : MonoBehaviour
         //return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + t_start;
         ////(s + 1) * t ^ 3 - s * t ^ 2) 
         float temp_val = (1 - t_delta);
-        return Mathf.LerpUnclamped(t_start, t_end, 1 - (Mathf.Pow(temp_val,3) - temp_val * Mathf.Sin(temp_val * PI)));
+        return Mathf.LerpUnclamped(t_start, t_end, 1 - (Mathf.Pow(temp_val, 3) - temp_val * Mathf.Sin(temp_val * PI)));
     }
 
     /// <summary>
@@ -898,12 +880,12 @@ public class Tweensy : MonoBehaviour
     /// y = (1/2)*((2x)^3-(2x)*sin(2*x*pi))           ; [0, 0.5)
     /// y = (1/2)*(1-((1-x)^3-(1-x)*sin((1-x)*pi))+1) ; [0.5, 1]
     /// </summary>
-     public float BackEaseInOut(float t_delta, float t_start, float t_end)
+    public float BackEaseInOut(float t_delta, float t_start, float t_end)
     {
         if (t_delta < 0.5f)
         {
             float temp_val = 2 * t_delta;
-            return Mathf.LerpUnclamped(t_start, t_end, 0.5f * (Mathf.Pow(temp_val,3) - temp_val * Mathf.Sin(temp_val * PI)));
+            return Mathf.LerpUnclamped(t_start, t_end, 0.5f * (Mathf.Pow(temp_val, 3) - temp_val * Mathf.Sin(temp_val * PI)));
         }
         else
         {
@@ -914,7 +896,7 @@ public class Tweensy : MonoBehaviour
 
     /// <summary>
     /// </summary>
-     public float BounceEaseIn(float t_delta, float t_start, float t_end)
+    public float BounceEaseIn(float t_delta, float t_start, float t_end)
     {
         return BounceEaseOut(1 - t_delta, true, t_start, t_end);
     }
@@ -928,7 +910,7 @@ public class Tweensy : MonoBehaviour
     /// <param name="t_easeIn">If set to <c>true</c>ease in.</param>
     /// <param name="t_start">T start.</param>
     /// <param name="t_end">T end.</param>
-     public float BounceEaseOut(float t_delta, bool t_easeIn, float t_start, float t_end)
+    public float BounceEaseOut(float t_delta, bool t_easeIn, float t_start, float t_end)
     {
         if (t_delta < 4 / 11.0f)
         {
@@ -966,7 +948,7 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Bounce out and land with a bounce
     /// </summary>
-     public float BounceEaseInOut(float t_delta, float t_start, float t_end)
+    public float BounceEaseInOut(float t_delta, float t_start, float t_end)
     {
         if (t_delta < IN_OUT)
         {
