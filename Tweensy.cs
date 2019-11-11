@@ -3,6 +3,9 @@
 /// Added in better naming conventions for start and end to start value and end value for clarity
 /// Removed bug where tween would not loop. Added in more options for tweening in 3 dimensions
 /// 
+/// Update: 11/11/2019
+/// Fixed bugs regarding 3D space for tweening objects
+/// 
 /// Made for use with Mr. Grayscale. Used Robert Penners functions to 
 /// make my own tweening tool for simple animations for use with Unity.
 /// 
@@ -202,8 +205,8 @@ public class Tweensy : MonoBehaviour
                 }
                 else
                 {
-                    startValue = transform.localScale.y;
-                    transform.localScale = new Vector3(transform.localScale.x, startValue, transform.localScale.z);
+                    startValue = transform.localScale.z;
+                    transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, startValue);
                 }
                 endValue = scaleTarget;
                 break;
@@ -212,12 +215,12 @@ public class Tweensy : MonoBehaviour
 
             /*======================== ROTATIONS ======================*/
             case ToTween.ROTATION_X:
-                startValue = transform.localEulerAngles.z;
+                startValue = transform.localEulerAngles.x;
                 endValue = rotationTarget;
                 break;
 
             case ToTween.ROTATION_Y:
-                startValue = transform.localEulerAngles.z;
+                startValue = transform.localEulerAngles.y;
                 endValue = rotationTarget;
                 break;
 
@@ -243,7 +246,7 @@ public class Tweensy : MonoBehaviour
             /*======================== ALPHA ======================*/
         }
 
-
+        // Set for allowing us to loop tweens
         initial = startValue;
         initialEnd = endValue;
 
@@ -408,42 +411,74 @@ public class Tweensy : MonoBehaviour
             // Assign Updated Values
             switch (toTween)
             {
+                /*==============================POSITIONS================================*/
                 case ToTween.POSITION_X:
-                    transform.localPosition = new Vector2(temp_value, transform.localPosition.y);
+                    transform.localPosition = new Vector3(temp_value, transform.localPosition.y, transform.localPosition.z);
                     break;
 
                 case ToTween.POSITION_Y:
-                    transform.localPosition = new Vector2(transform.localPosition.x, temp_value);
+                    transform.localPosition = new Vector3(transform.localPosition.x, temp_value, transform.localPosition.z);
                     break;
 
+                case ToTween.POSITION_Z:
+                    transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, temp_value);
+                    break;
+                /*==============================POSITIONS================================*/
+
+
+
+                /*==============================SCALE================================*/
                 case ToTween.SCALE_X:
                     if (GetComponent<Image>())
                     {
-                        transform.GetComponent<Image>().rectTransform.localScale = new Vector3(temp_value, transform.GetComponent<Image>().rectTransform.localScale.y);
+                        transform.GetComponent<Image>().rectTransform.localScale = new Vector3(temp_value, transform.GetComponent<Image>().rectTransform.localScale.y, transform.GetComponent<Image>().rectTransform.localScale.z);
                     }
                     else
                     {
-                        transform.localScale = new Vector2(temp_value, transform.localScale.y);
+                        transform.localScale = new Vector3(temp_value, transform.localScale.y, transform.localScale.z);
                     }
                     break;
 
                 case ToTween.SCALE_Y:
                     if (GetComponent<Image>())
                     {
-                        transform.GetComponent<Image>().rectTransform.localScale = new Vector3(transform.GetComponent<Image>().rectTransform.localScale.x, temp_value);
+                        transform.GetComponent<Image>().rectTransform.localScale = new Vector3(transform.GetComponent<Image>().rectTransform.localScale.x,temp_value, transform.GetComponent<Image>().rectTransform.localScale.z);
                     }
                     else
                     {
-                        transform.localScale = new Vector2(transform.localScale.x, temp_value);
+                        transform.localScale = new Vector3(transform.localScale.x,temp_value, transform.localScale.z);
                     }
                     break;
 
+                case ToTween.SCALE_Z:
+                    if (GetComponent<Image>())
+                    {
+                        transform.GetComponent<Image>().rectTransform.localScale = new Vector3(transform.GetComponent<Image>().rectTransform.localScale.x, transform.GetComponent<Image>().rectTransform.localScale.y,temp_value);
+                    }
+                    else
+                    {
+                        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, temp_value);
+                    }
+                    break;
+                /*==============================SCALE================================*/
+
+                /*==============================ROTATION================================*/
                 case ToTween.ROTATION_Z:
                     transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, transform.localEulerAngles.y, temp_value);
 
                     break;
+                case ToTween.ROTATION_Y:
+                    transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, temp_value, transform.localEulerAngles.z);
 
+                    break;
+                case ToTween.ROTATION_X:
+                    transform.localEulerAngles = new Vector3(temp_value, transform.localEulerAngles.y, transform.localEulerAngles.z);
 
+                    break;
+
+                /*==============================ROTATION================================*/
+
+                /*==============================ALPHA================================*/
                 case ToTween.ALPHA:
                     if (GetComponent<SpriteRenderer>())
                     {
@@ -458,29 +493,17 @@ public class Tweensy : MonoBehaviour
                         GetComponent<Image>().color = temp_color;
                     }
                     break;
+                    /*==============================ALPHA================================*/
             }
 
+            // if the absolute value or closest to is reached we set isPlaying to false
             if (System.Math.Abs(temp_value - endValue) < Mathf.Epsilon)
             {
                 isPlaying = false;
             }
+            
 
-            switch (toTween)
-            {
-                case ToTween.ROTATION_Z:
-                    if (System.Math.Abs(temp_value - endValue) < Mathf.Epsilon)
-                    {
-                        if (isPlaying)
-                        {
-                            Debug.Log("workis");
-                            //temp_value = 0;
-                            isPlaying = false;
-                        }
-                    }
-                    break;
-            }
-
-        } // end if is playing && !rotating
+        } // end if is playing
 
 
        
@@ -577,20 +600,33 @@ public class Tweensy : MonoBehaviour
         endValue = initialEnd;
         startValue = initial;
     }
+
+
     void ReplayAnimation()
     {
 
         // Assign Updated Values
         switch (toTween)
         {
+
+            /*======================== POSITIONS ======================*/
             case ToTween.POSITION_X:
-                transform.localPosition = new Vector2(startValue, transform.localPosition.y);
+                transform.localPosition = new Vector3(startValue, transform.localPosition.y, transform.localPosition.z);
                 break;
 
             case ToTween.POSITION_Y:
-                transform.localPosition = new Vector2(transform.localPosition.x, startValue);
+                transform.localPosition = new Vector3(transform.localPosition.x, startValue, transform.localPosition.z);
                 break;
 
+            case ToTween.POSITION_Z:
+                transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, startValue);
+                break;
+            /*======================== POSITIONS ======================*/
+
+
+
+
+            /*======================== SCALE ======================*/
             case ToTween.SCALE_X:
                 if (GetComponent<Image>())
                 {
@@ -598,7 +634,7 @@ public class Tweensy : MonoBehaviour
                 }
                 else
                 {
-                    transform.localScale = new Vector2(startValue, transform.localScale.y);
+                    transform.localScale = new Vector3(startValue, transform.localScale.y, transform.localScale.z);
                 }
                 break;
 
@@ -609,16 +645,41 @@ public class Tweensy : MonoBehaviour
                 }
                 else
                 {
-                    transform.localScale = new Vector2(transform.localScale.x, startValue);
+                    transform.localScale = new Vector3(transform.localScale.x, startValue, transform.localScale.z);
                 }
                 break;
 
+            case ToTween.SCALE_Z:
+                if (GetComponent<Image>())
+                {
+                    transform.GetComponent<Image>().rectTransform.localScale = new Vector3(transform.GetComponent<Image>().rectTransform.localScale.x, transform.GetComponent<Image>().rectTransform.localScale.y, startValue);
+                }
+                else
+                {
+                    transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, startValue);
+                }
+                break;
+            /*======================== SCALE ======================*/
+
+
+
+            /*======================== ROTATION ======================*/
             case ToTween.ROTATION_Z:
                 transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, transform.localEulerAngles.y, startValue);
 
                 break;
+            case ToTween.ROTATION_Y:
+                transform.localEulerAngles = new Vector3(transform.localEulerAngles.x,startValue, transform.localEulerAngles.z);
+
+                break;
+            case ToTween.ROTATION_X:
+                transform.localEulerAngles = new Vector3(startValue, transform.localEulerAngles.y, transform.localEulerAngles.z);
+
+                break;
+            /*======================== ROTATION ======================*/
 
 
+            /*======================== ALPHA ======================*/
             case ToTween.ALPHA:
                 if (GetComponent<SpriteRenderer>())
                 {
@@ -633,6 +694,7 @@ public class Tweensy : MonoBehaviour
                     GetComponent<Image>().color = temp_color;
                 }
                 break;
+             /*======================== ALPHA ======================*/
         }
     }
 
