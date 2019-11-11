@@ -1,14 +1,23 @@
 ///<summary> 
-/// Updated: 11/11/2019 Removed Mr. Grayscale dependencies to work as a stand alone tween script
-/// Made for use with Mr. Grayscale. Used Robert Penners functions to make my own tweening tool for simple animations for use with Unity. 
+/// Updated 11/11/2019 to remove dependancies on Mr Grayscale Scripts.
+/// Added in better naming conventions for start and end to start value and end value for clarity
+/// Removed bug where tween would not loop. Added in more options for tweening in 3 dimensions
+/// 
+/// Made for use with Mr. Grayscale. Used Robert Penners functions to 
+/// make my own tweening tool for simple animations for use with Unity.
+/// 
 /// Name Tweensy was used to preent clashes with DoTween in UnityEngine
 /// Free to use for whatever reason with no warranty
-/// Free to edit and redistribute in anyway you would like that doesn't affect Robert Penners licenses http://robertpenner.com/easing_terms_of_use.html
+/// Free to edit and redistribute in anyway you would like that doesn't affect 
+/// Robert Penners licenses http://robertpenner.com/easing_terms_of_use.html
+/// 
+///
+///
+/// Note to self: could optimise by caching initial images rather 
+/// than using get component on each frame avoiding garbage collection build up
+/// Bugs: No Known Bugs
+/// 
 /// </summary>
-
-
-// Note to self: could optimise by caching initial images rather than using get component on each frame avoiding garbage collection build up
-// Bugs: No Known Bugs
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,11 +40,12 @@ public class Tweensy : MonoBehaviour
     /// </summary>
     private readonly float IN_OUT = .415f;
 
+    // The length of time it takes for an object to get to it's end position
     public float time = 2;
     private float initial;
     private float initialEnd;
-    public float start;
-    public float end;
+    public float startValue; 
+    public float endValue;
     private float startTime;
 
 
@@ -64,17 +74,19 @@ public class Tweensy : MonoBehaviour
     private float rotatedAt = 0;
     private float timeToAddOn;
     bool setNewTimeSince = false;
-
-    [Space(10)]
-    public bool isPillar = false;
+    
 
     public enum ToTween
     {
         POSITION_X,
         POSITION_Y,
+        POSITION_Z,
+        ROTATION_X,
+        ROTATION_Y,
         ROTATION_Z,
         SCALE_X,
         SCALE_Y,
+        SCALE_Z,
         ALPHA
     }
 
@@ -134,66 +146,106 @@ public class Tweensy : MonoBehaviour
 
         switch (toTween)
         {
+            /*======================== POSITIONS ======================*/
             case ToTween.POSITION_X:
-                start = transform.localPosition.x;
-                end = target.transform.localPosition.x;
+                startValue = transform.localPosition.x;
+                endValue = target.transform.localPosition.x;
                 break;
 
             case ToTween.POSITION_Y:
-                start = transform.localPosition.y;
-                end = target.transform.localPosition.y;
+                startValue = transform.localPosition.y;
+                endValue = target.transform.localPosition.y;
                 break;
 
+            case ToTween.POSITION_Z:
+                startValue = transform.localPosition.z;
+                endValue = target.transform.localPosition.z;
+                break;
+            /*======================== POSITIONS ======================*/
+
+
+            /*======================== SCALE ======================*/
             case ToTween.SCALE_X:
                 if (GetComponent<Image>())
                 {
-                    start = transform.GetComponent<Image>().rectTransform.localScale.x;
-                    transform.GetComponent<Image>().rectTransform.localScale = new Vector3(start, transform.GetComponent<Image>().rectTransform.localScale.y, transform.GetComponent<Image>().rectTransform.localScale.z);
+                    startValue = transform.GetComponent<Image>().rectTransform.localScale.x;
+                    transform.GetComponent<Image>().rectTransform.localScale = new Vector3(startValue, transform.GetComponent<Image>().rectTransform.localScale.y, transform.GetComponent<Image>().rectTransform.localScale.z);
                 }
                 else
                 {
-                    start = transform.localScale.x;
-                    transform.localScale = new Vector3(start, transform.localScale.y, transform.localScale.z);
+                    startValue = transform.localScale.x;
+                    transform.localScale = new Vector3(startValue, transform.localScale.y, transform.localScale.z);
                 }
 
-                end = scaleTarget;
+                endValue = scaleTarget;
                 break;
 
             case ToTween.SCALE_Y:
                 if (GetComponent<Image>())
                 {
-                    start = transform.GetComponent<Image>().rectTransform.localScale.y;
-                    transform.GetComponent<Image>().rectTransform.localScale = new Vector3(transform.GetComponent<Image>().rectTransform.localScale.x, start, transform.GetComponent<Image>().rectTransform.localScale.z);
+                    startValue = transform.GetComponent<Image>().rectTransform.localScale.y;
+                    transform.GetComponent<Image>().rectTransform.localScale = new Vector3(transform.GetComponent<Image>().rectTransform.localScale.x, startValue, transform.GetComponent<Image>().rectTransform.localScale.z);
                 }
                 else
                 {
-                    start = transform.localScale.y;
-                    transform.localScale = new Vector3(transform.localScale.x, start, transform.localScale.z);
+                    startValue = transform.localScale.y;
+                    transform.localScale = new Vector3(transform.localScale.x, startValue, transform.localScale.z);
                 }
-                end = scaleTarget;
+                endValue = scaleTarget;
+                break;
+
+            case ToTween.SCALE_Z:
+                if (GetComponent<Image>())
+                {
+                    startValue = transform.GetComponent<Image>().rectTransform.localScale.z;
+                    transform.GetComponent<Image>().rectTransform.localScale = new Vector3(transform.GetComponent<Image>().rectTransform.localScale.x,transform.GetComponent<Image>().rectTransform.localScale.y,startValue);
+                }
+                else
+                {
+                    startValue = transform.localScale.y;
+                    transform.localScale = new Vector3(transform.localScale.x, startValue, transform.localScale.z);
+                }
+                endValue = scaleTarget;
+                break;
+            /*======================== SCALE ======================*/
+
+
+            /*======================== ROTATIONS ======================*/
+            case ToTween.ROTATION_X:
+                startValue = transform.localEulerAngles.z;
+                endValue = rotationTarget;
+                break;
+
+            case ToTween.ROTATION_Y:
+                startValue = transform.localEulerAngles.z;
+                endValue = rotationTarget;
                 break;
 
             case ToTween.ROTATION_Z:
-                start = transform.localEulerAngles.z;
-                end = rotationTarget;
+                startValue = transform.localEulerAngles.z;
+                endValue = rotationTarget;
                 break;
+            /*======================== ROTATIONS ======================*/
 
 
+            /*======================== ALPHA ======================*/
             case ToTween.ALPHA:
                 if (GetComponent<SpriteRenderer>())
                 {
-                    start = GetComponent<SpriteRenderer>().color.a;
-                    end = opacityTarget;
+                    startValue = GetComponent<SpriteRenderer>().color.a;
                 }
                 if (GetComponent<Image>())
                 {
-                    start = GetComponent<Image>().color.a;
-                    end = opacityTarget;
+                    startValue = GetComponent<Image>().color.a;
                 }
+                endValue = opacityTarget;
                 break;
+            /*======================== ALPHA ======================*/
         }
-        initial = start;
-        initialEnd = end;
+
+
+        initial = startValue;
+        initialEnd = endValue;
 
 
 
@@ -218,129 +270,129 @@ public class Tweensy : MonoBehaviour
             switch (tweenType)
             {
                 case Tweens.LINEAR:
-                    temp_value = Linear(DeltaTime(), start, end);
+                    temp_value = Linear(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.QUADRATIC_EASE_IN:
-                    temp_value = QuadraticEaseIn(DeltaTime(), start, end);
+                    temp_value = QuadraticEaseIn(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.QUADRATIC_EASE_OUT:
-                    temp_value = QuadraticEaseOut(DeltaTime(), start, end);
+                    temp_value = QuadraticEaseOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.QUADRATIC_EASE_IN_OUT:
-                    temp_value = QuadraticEaseInOut(DeltaTime(), start, end);
+                    temp_value = QuadraticEaseInOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.CUBIC_EASE_IN:
-                    temp_value = CubicEaseIn(DeltaTime(), start, end);
+                    temp_value = CubicEaseIn(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.CUBIC_EASE_OUT:
-                    temp_value = CubicEaseOut(DeltaTime(), start, end);
+                    temp_value = CubicEaseOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.CUBIC_EASE_IN_OUT:
-                    temp_value = CubicEaseInOut(DeltaTime(), start, end);
+                    temp_value = CubicEaseInOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.QUARTIC_EASE_IN:
-                    temp_value = QuarticEaseIn(DeltaTime(), start, end);
+                    temp_value = QuarticEaseIn(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.QUARTIC_EASE_OUT:
-                    temp_value = QuarticEaseOut(DeltaTime(), start, end);
+                    temp_value = QuarticEaseOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.QUARTIC_EASE_IN_OUT:
-                    temp_value = QuarticEaseInOut(DeltaTime(), start, end);
+                    temp_value = QuarticEaseInOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.QUINTIC_EASE_IN:
-                    temp_value = QuinticEaseIn(DeltaTime(), start, end);
+                    temp_value = QuinticEaseIn(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.QUINTIC_EASE_OUT:
-                    temp_value = QuinticEaseOut(DeltaTime(), start, end);
+                    temp_value = QuinticEaseOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.QUINTIC_EASE_IN_OUT:
-                    temp_value = QuarticEaseInOut(DeltaTime(), start, end);
+                    temp_value = QuarticEaseInOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.CIRCULAR_EASE_IN:
-                    temp_value = CircularEaseIn(DeltaTime(), start, end);
+                    temp_value = CircularEaseIn(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.CIRCULAR_EASE_OUT:
-                    temp_value = CircularEaseOut(DeltaTime(), start, end);
+                    temp_value = CircularEaseOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.CIRCULAR_EASE_IN_OUT:
-                    temp_value = CircularEaseInOut(DeltaTime(), start, end);
+                    temp_value = CircularEaseInOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.EXPONENTIAL_EASE_IN:
-                    temp_value = ExponentialEaseIn(DeltaTime(), start, end);
+                    temp_value = ExponentialEaseIn(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.EXPONENTIAL_EASE_OUT:
-                    temp_value = ExponentialEaseOut(DeltaTime(), start, end);
+                    temp_value = ExponentialEaseOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.EXPONENTIAL_EASE_IN_OUT:
-                    temp_value = ExponentialEaseInOut(DeltaTime(), start, end);
+                    temp_value = ExponentialEaseInOut(DeltaTime(), startValue, endValue);
                     break;
 
 
                 case Tweens.ELASTIC_EASE_IN:
-                    temp_value = ElasticEaseIn(DeltaTime(), start, end);
+                    temp_value = ElasticEaseIn(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.ELASTIC_EASE_OUT:
-                    temp_value = ElasticEaseOut(DeltaTime(), start, end);
+                    temp_value = ElasticEaseOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.ELASTIC_EASE_IN_OUT:
-                    temp_value = ElasticEaseInOut(DeltaTime(), start, end);
+                    temp_value = ElasticEaseInOut(DeltaTime(), startValue, endValue);
                     break;
 
 
                 case Tweens.BACK_EASE_IN:
-                    temp_value = BackEaseIn(DeltaTime(), start, end);
+                    temp_value = BackEaseIn(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.BACK_EASE_OUT:
-                    temp_value = BackEaseOut(DeltaTime(), start, end);
+                    temp_value = BackEaseOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.BACK_EASE_IN_OUT:
-                    temp_value = BackEaseInOut(DeltaTime(), start, end);
+                    temp_value = BackEaseInOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.SINE_EASE_IN:
-                    temp_value = SineEaseIn(DeltaTime(), start, end);
+                    temp_value = SineEaseIn(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.SINE_EASE_OUT:
-                    temp_value = SineEaseOut(DeltaTime(), start, end);
+                    temp_value = SineEaseOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.SINE_EASE_IN_OUT:
-                    temp_value = SineEaseInOut(DeltaTime(), start, end);
+                    temp_value = SineEaseInOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.BOUNCE_EASE_IN:
-                    temp_value = BounceEaseIn(DeltaTime(), start, end);
+                    temp_value = BounceEaseIn(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.BOUNCE_EASE_OUT:
-                    temp_value = BounceEaseOut(DeltaTime(), false, start, end);
+                    temp_value = BounceEaseOut(DeltaTime(), false, startValue, endValue);
                     break;
 
                 case Tweens.BOUNCE_EASE_IN_OUT:
-                    temp_value = BounceEaseInOut(DeltaTime(), start, end);
+                    temp_value = BounceEaseInOut(DeltaTime(), startValue, endValue);
                     break;
 
                 case Tweens.CURVE:
@@ -408,7 +460,7 @@ public class Tweensy : MonoBehaviour
                     break;
             }
 
-            if (System.Math.Abs(temp_value - end) < Mathf.Epsilon)
+            if (System.Math.Abs(temp_value - endValue) < Mathf.Epsilon)
             {
                 isPlaying = false;
             }
@@ -416,7 +468,7 @@ public class Tweensy : MonoBehaviour
             switch (toTween)
             {
                 case ToTween.ROTATION_Z:
-                    if (System.Math.Abs(temp_value - end) < Mathf.Epsilon)
+                    if (System.Math.Abs(temp_value - endValue) < Mathf.Epsilon)
                     {
                         if (isPlaying)
                         {
@@ -448,7 +500,8 @@ public class Tweensy : MonoBehaviour
             }
         }
 
-        if (play && !isPlaying || loop)
+        // if play selected and not playing or is not playing and looping
+        if ((!isPlaying && loop) || (play && !isPlaying))
         {
             switchAtEnd = true;
             Bounce();
@@ -515,14 +568,14 @@ public class Tweensy : MonoBehaviour
     void ExitAnimation()
     {
         tweenType = exitTween;
-        end = initial;
-        start = initialEnd;
+        endValue = initial;
+        startValue = initialEnd;
     }
     void EnterAnimation()
     {
         tweenType = enteringTween;
-        end = initialEnd;
-        start = initial;
+        endValue = initialEnd;
+        startValue = initial;
     }
     void ReplayAnimation()
     {
@@ -531,37 +584,37 @@ public class Tweensy : MonoBehaviour
         switch (toTween)
         {
             case ToTween.POSITION_X:
-                transform.localPosition = new Vector2(start, transform.localPosition.y);
+                transform.localPosition = new Vector2(startValue, transform.localPosition.y);
                 break;
 
             case ToTween.POSITION_Y:
-                transform.localPosition = new Vector2(transform.localPosition.x, start);
+                transform.localPosition = new Vector2(transform.localPosition.x, startValue);
                 break;
 
             case ToTween.SCALE_X:
                 if (GetComponent<Image>())
                 {
-                    transform.GetComponent<Image>().rectTransform.localScale = new Vector3(start, transform.GetComponent<Image>().rectTransform.localScale.y);
+                    transform.GetComponent<Image>().rectTransform.localScale = new Vector3(startValue, transform.GetComponent<Image>().rectTransform.localScale.y);
                 }
                 else
                 {
-                    transform.localScale = new Vector2(start, transform.localScale.y);
+                    transform.localScale = new Vector2(startValue, transform.localScale.y);
                 }
                 break;
 
             case ToTween.SCALE_Y:
                 if (GetComponent<Image>())
                 {
-                    transform.GetComponent<Image>().rectTransform.localScale = new Vector3(transform.GetComponent<Image>().rectTransform.localScale.x, start);
+                    transform.GetComponent<Image>().rectTransform.localScale = new Vector3(transform.GetComponent<Image>().rectTransform.localScale.x, startValue);
                 }
                 else
                 {
-                    transform.localScale = new Vector2(transform.localScale.x, start);
+                    transform.localScale = new Vector2(transform.localScale.x, startValue);
                 }
                 break;
 
             case ToTween.ROTATION_Z:
-                transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, transform.localEulerAngles.y, start);
+                transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, transform.localEulerAngles.y, startValue);
 
                 break;
 
@@ -570,13 +623,13 @@ public class Tweensy : MonoBehaviour
                 if (GetComponent<SpriteRenderer>())
                 {
                     Color temp_color = GetComponent<SpriteRenderer>().color;
-                    temp_color.a = start;
+                    temp_color.a = startValue;
                     GetComponent<SpriteRenderer>().color = temp_color;
                 }
                 else if (GetComponent<Image>())
                 {
                     Color temp_color = GetComponent<Image>().color;
-                    temp_color.a = start;
+                    temp_color.a = startValue;
                     GetComponent<Image>().color = temp_color;
                 }
                 break;
@@ -969,7 +1022,7 @@ public class Tweensy : MonoBehaviour
     /// <param name="t_delta">T delta.</param>
     private float Curve(float t_delta)
     {
-        return (end - start) * curve.Evaluate(t_delta) + start;
+        return (endValue - startValue) * curve.Evaluate(t_delta) + startValue;
     }
 
 
