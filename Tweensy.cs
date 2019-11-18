@@ -1,5 +1,6 @@
 ///<summary> 
 /// Updated 18/11/2019 added in beter naming conventions for readability and removed some Mr Grayscale dependant code
+/// Updated 18/11/2019 again found more Mr. Grayscale code that was removed
 /// 
 /// 
 /// Updated 11/11/2019 to remove dependancies on Mr Grayscale Scripts.
@@ -12,7 +13,7 @@
 /// Made for use with Mr. Grayscale. Used Robert Penners functions to 
 /// make my own tweening tool for simple animations for use with Unity.
 /// 
-/// Name Tweensy was used to preent clashes with DoTween in UnityEngine
+/// Name Tweensy was used to preent clashes with DoTween in UnityEngine as I didn't want to add name spacing
 /// Free to use for whatever reason with no warranty
 /// Free to edit and redistribute in anyway you would like that doesn't affect 
 /// Robert Penners licenses http://robertpenner.com/easing_terms_of_use.html
@@ -48,10 +49,16 @@ public class Tweensy : MonoBehaviour
 
     // The length of time it takes for an object to get to it's end position
     public float time = 2;
+
+    // initial start value and initial end value for use if we allow loops
     private float _initial;
     private float _initialEnd;
+
+    // User inputted start and end vaues
     public float startValue; 
     public float endValue;
+
+    // time the tween start playing
     private float _startTime;
 
 
@@ -62,9 +69,11 @@ public class Tweensy : MonoBehaviour
     [Range(0, 1)]
     public float opacityTarget;
 
+    // target value to be reached
     public float rotationTarget;
     public float scaleTarget;
 
+    // if tween is to switch into the exit or enter state
     private bool _switchAtEnd = false;
 
 
@@ -74,12 +83,9 @@ public class Tweensy : MonoBehaviour
     public bool play = false;
     public bool loop = false;
 
+    // Used for having a positiion to reach
     public Transform target;
-
-    private bool _addToTime = false;
-    private float _rotatedAt = 0;
-    private float _timeToAddOn;
-    private bool _setNewTimeSince = false;
+    
     
 
     public enum ToTween
