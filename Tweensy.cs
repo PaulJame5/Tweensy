@@ -1,4 +1,7 @@
 ///<summary> 
+/// Updated 18/11/2019 added in beter naming conventions for readability and removed some Mr Grayscale dependant code
+/// 
+/// 
 /// Updated 11/11/2019 to remove dependancies on Mr Grayscale Scripts.
 /// Added in better naming conventions for start and end to start value and end value for clarity
 /// Removed bug where tween would not loop. Added in more options for tweening in 3 dimensions
@@ -41,15 +44,15 @@ public class Tweensy : MonoBehaviour
     /// <summary>
     /// Used for smoothing out bounceeaseinout
     /// </summary>
-    private readonly float IN_OUT = .415f;
+    private const float IN_OUT = .415f;
 
     // The length of time it takes for an object to get to it's end position
     public float time = 2;
-    private float initial;
-    private float initialEnd;
+    private float _initial;
+    private float _initialEnd;
     public float startValue; 
     public float endValue;
-    private float startTime;
+    private float _startTime;
 
 
 
@@ -62,7 +65,7 @@ public class Tweensy : MonoBehaviour
     public float rotationTarget;
     public float scaleTarget;
 
-    bool switchAtEnd = false;
+    private bool _switchAtEnd = false;
 
 
     [Tooltip("If you select curve from the tween option you can select your own tween curve")]
@@ -73,10 +76,10 @@ public class Tweensy : MonoBehaviour
 
     public Transform target;
 
-    private bool addToTime = false;
-    private float rotatedAt = 0;
-    private float timeToAddOn;
-    bool setNewTimeSince = false;
+    private bool _addToTime = false;
+    private float _rotatedAt = 0;
+    private float _timeToAddOn;
+    private bool _setNewTimeSince = false;
     
 
     public enum ToTween
@@ -247,8 +250,8 @@ public class Tweensy : MonoBehaviour
         }
 
         // Set for allowing us to loop tweens
-        initial = startValue;
-        initialEnd = endValue;
+        _initial = startValue;
+        _initialEnd = endValue;
 
 
 
@@ -258,17 +261,8 @@ public class Tweensy : MonoBehaviour
     void Update()
     {
         float temp_value = 0;
-
-        // This can be removed for your own projects as this was made to work with Mr. Grayscale
-        if (addToTime)
-        {
-            timeToAddOn = Time.timeSinceLevelLoad - rotatedAt;
-            startTime += timeToAddOn;
-            setNewTimeSince = false;
-            addToTime = false;
-        }
-        // World Rotation can be removed to suit your own project needs
-        else if (isPlaying)
+        
+        if (isPlaying)
         {
             switch (tweenType)
             {
@@ -509,9 +503,9 @@ public class Tweensy : MonoBehaviour
        
 
         // switch at end to change state from enter to exit
-        if (!isPlaying && switchAtEnd)
+        if (!isPlaying && _switchAtEnd)
         {
-            switchAtEnd = false;
+            _switchAtEnd = false;
             switch (state)
             {
                 case State.ENTER:
@@ -526,7 +520,7 @@ public class Tweensy : MonoBehaviour
         // if play selected and not playing or is not playing and looping
         if ((!isPlaying && loop) || (play && !isPlaying))
         {
-            switchAtEnd = true;
+            _switchAtEnd = true;
             Bounce();
 
             foreach (Tweensy tween in GetComponents<Tweensy>())
@@ -552,7 +546,7 @@ public class Tweensy : MonoBehaviour
 
     float DeltaTime()
     {
-        float timeDelta = Time.timeSinceLevelLoad - startTime;
+        float timeDelta = Time.timeSinceLevelLoad - _startTime;
 
         if (timeDelta < time)
         {
@@ -585,20 +579,20 @@ public class Tweensy : MonoBehaviour
             ReplayAnimation();
         }
 
-        startTime = Time.timeSinceLevelLoad;
+        _startTime = Time.timeSinceLevelLoad;
     }
 
     void ExitAnimation()
     {
         tweenType = exitTween;
-        endValue = initial;
-        startValue = initialEnd;
+        endValue = _initial;
+        startValue = _initialEnd;
     }
     void EnterAnimation()
     {
         tweenType = enteringTween;
-        endValue = initialEnd;
-        startValue = initial;
+        endValue = _initialEnd;
+        startValue = _initial;
     }
 
 
